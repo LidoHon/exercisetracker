@@ -120,11 +120,16 @@ app.get('/api/users/:_id/logs', async (req, res) => {
 
 		if (from || to) {
 			filter.date = {};
-			if (from) filter.date.$gte = new Date(from).toDateString();
-			if (to) filter.date.$lte = new Date(to).toDateString();
+			if (from) filter.date.$gte = new Date(from).toISOString().split('T')[0];
+			if (to) filter.date.$lte = new Date(to).toISOString().split('T')[0];
 		}
 
-		const logs = await Exercise.find(filter).limit(parseInt(limit)).exec();
+		const logsQuery = Exercise.find(filter);
+		if (limit) {
+			logsQuery.limit(parseInt(limit));
+		}
+
+		const logs = await logsQuery.exec();
 
 		res.json({
 			username: user.username,
